@@ -18,3 +18,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::post('/saveApp', 'App\Http\Controllers\HomeController@saveApp')->name('saveApp');
+Route::post('/checkExistingApp', 'App\Http\Controllers\HomeController@checkExistingApp')->name('checkExistingApp');

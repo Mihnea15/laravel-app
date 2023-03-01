@@ -29,11 +29,12 @@
 
 <script>
     let timeIntervals = [];
+    let date = null;
     function addAppointment(el) {
-        let date = $(el).attr('data-date')
+        date = $(el).attr('data-date')
         if (!$('.fc-daygrid-day-events').find('.start-time-picker_' + date).length) {
             $(el).find('.fc-daygrid-day-events').prepend(`
-                <div class="app_"` + date + `>
+                <div class="app_` + date + `">
                     <label>Appointment hours</label>
                     <br>
                     <input type="time" class="start-time-picker_` + date + `"> -
@@ -49,6 +50,39 @@
         });
         $('.stop-time-picker_' + date).on('change', function () {
             timeIntervals['stop'] = $(this).val();
+        });
+    }
+
+    function checkExistingApp()
+    {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        })
+        $.ajax({
+            type: 'post',
+            enctype: 'multipart/form-data',
+            url: "/checkExistingApp",
+            // dataType: "json",
+            data: {
+            },
+            success: function(result){
+                console.log(typeof(result))
+                for (let i = 0; i < result.length; i++) {
+                    let date = result[i]['start'].split(' ')[0];
+                    let startHour = result[i]['start'].split(' ')[1];
+                    let stopHour = result[i]['stop'].split(' ')[1];
+                    $('td[data-date="' + date + '"]').find('.fc-daygrid-day-events').append(`
+                        <div style="background-color: #7d7dd6; text-align: center; color: white; border-radius: 20px;">
+                            <p>` + startHour + `-` + stopHour +`</p>
+                        </div>
+                    `);
+                }
+            },
+            error: function (result) {
+                alert(result.responseJSON)
+            }
         });
     }
 
@@ -72,13 +106,21 @@
                 start: start,
                 stop: stop
             },
-            success: function(result){
-                console.log(result);
+            success: function(result) {
+                $('.app_' + date).append(`
+                    <div style="background-color: #7d7dd6; text-align: center; color: white; border-radius: 20px;">
+                            <p>` + result[0].split(' ')[1] + `-` + result[1].split(' ')[1] +`</p>
+                    </div>
+                `)
             },
             error: function (result) {
                 alert(result.responseJSON)
             }
         });
     }
+
+    $(document).ready(function () {
+        checkExistingApp();
+    });
 </script>
 

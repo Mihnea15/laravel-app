@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\User;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Type\Time;
 use function Symfony\Component\Translation\t;
 
@@ -48,24 +50,41 @@ class HomeController extends Controller
                 $model->stop = $date->date . ' ' . $date->stop;
                 $model->client_id = 1;
                 $model->save();
+                return [$model->start, $model->stop];
             } else {
+                $appointment = DB::table('appointments')
+                    ->where('start', 'LIKE', '%' . $date->date . ' ' . explode(':', $date->start)[0] . '%')
+                    ->where('stop', 'LIKE', '%' . $date->date . ' ' . explode(':', $date->stop)[0] . '%')->get();
+                if (!$appointment->isEmpty()) {
+                    return \Illuminate\Support\Facades\Response::json('An appointment for this interval already exist', 500);
+                }
                 foreach ($appointments as $appointment) {
-                    $day = explode(' ', $appointment->start)[0];
-                    $startHour = explode(' ', $appointment->start)[1];
-                    $stopHour = explode(' ', $appointment->stop)[1];
-                    if ($day == $date->date) {
-                        if ($startHour == $date->start . ':00' || $stopHour == $date->stop . ':00') {
-                            return \Illuminate\Support\Facades\Response::json('An appointment for this interval already exist', 500);
-                        }
-                        var_dump(round(abs(strtotime($stopHour) - strtotime($date->start)), 2));
-                        if (round(abs(strtotime($stopHour) - strtotime($date->start)), 2) < 1200) {
+                    $appointmentDay = explode(' ', $appointment->start)[0];
+                    if ($date->date == $appointmentDay) {
+                        $stopHour = explode(' ', $appointment->stop)[1];
+                        if (round(abs(strtotime($date->start) - strtotime($stopHour)), 2) < 1200) {
                             return \Illuminate\Support\Facades\Response::json('Appointments must have half an hour between them', 500);
                         }
                     }
+                    $model = new Appointment();
+                    $model->start = $date->date . ' ' . $date->start;
+                    $model->stop = $date->date . ' ' . $date->stop;
+                    $model->client_id = 1;
+                    $model->save();
+                    return [$model->start, $model->stop];
                 }
             }
-            return true;
         }
-        return \Illuminate\Support\Facades\Response::json('Invalid interval', 500);
+        return \Illuminate\Support\Facades\Response::json('Appointments must be between 09:00-13:00 or 15:30-21:00', 500);
+    }
+
+    public function checkExistingApp()
+    {
+        $existingApp = [];
+        $appointments = Appointment::all();
+        if (!$appointments->isEmpty()) {
+            return $appointments;
+        }
+        return 'No appointments found';
     }
 }
