@@ -56,9 +56,12 @@
         if (!$('.fc-daygrid-day-events').find('.start-time-picker_' + date).length) {
             $(el).find('.fc-daygrid-day-events').prepend(`
                 <div class="app_` + date + ` col-9 container">
-                    <label>Appointment hours</label>
+                    <button class="btn btn-sm btn-danger float-end" onclick="removeApp()">&#10006</button>
+                    <span>Appointment intervals</span>
                     <br>
-                    <input type="time" class="timepicker_start form-control start-time-picker_` + date + `">
+                    <small>(09:00-13:00 / 15:30-21:00)</small>
+                    <br>
+                    <input type="time" class="timepicker_start form-control mb-2 start-time-picker_` + date + `">
                     <input type="time" class="timepicker_stop form-control stop-time-picker_` + date + `">
                     <button class="new_app btn btn-secondary mt-2 mb-2 w-100" onclick="saveApp()">Add another appointment</button>
                 </div>
@@ -72,6 +75,11 @@
         $('.stop-time-picker_' + date).on('change', function () {
             timeIntervals['stop'] = $(this).val();
         });
+    }
+
+    function removeApp()
+    {
+        $('.app_' + date).remove();
     }
 
     function checkExistingApp()
