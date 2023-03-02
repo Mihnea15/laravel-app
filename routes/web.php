@@ -19,3 +19,4 @@ Route::get('/', function () {
 });
 Route::post('/saveApp', 'App\Http\Controllers\HomeController@saveApp')->name('saveApp');
 Route::post('/checkExistingApp', 'App\Http\Controllers\HomeController@checkExistingApp')->name('checkExistingApp');
+Route::get('/removeApp', 'App\Http\Controllers\HomeController@removeAppointment')->name('removeApp');

@@ -42,6 +42,7 @@
         </script>
     </head>
     <body>
+    <h1 class="text-center">Appointment calendar</h1>
         <div id='calendar'></div>
         <div>
         </div>
@@ -56,7 +57,7 @@
         if (!$('.fc-daygrid-day-events').find('.start-time-picker_' + date).length) {
             $(el).find('.fc-daygrid-day-events').prepend(`
                 <div class="app_` + date + ` col-9 container">
-                    <button class="btn btn-sm btn-danger float-end" onclick="removeApp()">&#10006</button>
+                    <button class="btn btn-sm btn-danger remove-app float-end">&#10006</button>
                     <span>Appointment intervals</span>
                     <br>
                     <small>(09:00-13:00 / 15:30-21:00)</small>
@@ -68,6 +69,10 @@
             `);
         }
 
+        $('.remove-app').on('click', function () {
+            $('.app_' + date).remove();
+        });
+
         $('.start-time-picker_' + date).on('change', function () {
             timeIntervals['date'] = $(el).attr('data-date');
             timeIntervals['start'] = $(this).val();
@@ -77,9 +82,31 @@
         });
     }
 
-    function removeApp()
+    function removeApp(el)
     {
-        $('.app_' + date).remove();
+        let dateToRm = $(el).attr('data-date');
+        let id = $(el).attr('data-id');
+        setTimeout(function () {
+            $('.app_' + dateToRm).remove();
+        }, 1);
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            type: 'get',
+            enctype: 'multipart/form-data',
+            url: "/removeApp",
+            // dataType: "json",
+            data: {id: id},
+            success: function(result) {
+                $('div[data-id="' + id + '"]').remove();
+            },
+            error: function (result) {
+                alert(result.responseJSON);
+            }
+        });
     }
 
     function checkExistingApp()
@@ -102,8 +129,11 @@
                     let startHour = result[i]['start'].split(' ')[1];
                     let stopHour = result[i]['stop'].split(' ')[1];
                     $('td[data-date="' + date + '"]').find('.fc-daygrid-day-events').append(`
-                        <div style="background-color: #7d7dd6; text-align: center; color: white; border-radius: 20px;">
-                            <p>` + startHour + `-` + stopHour +`</p>
+                        <div data-id="` + result[i]['id'] + `">
+                            <button class="float-end btn btn-sm pt-0 ml-2" data-id="` + result[i]['id'] + `" data-date="` + date + `" onclick="removeApp(this)">&#10006</button>
+                            <div style="background-color: #7d7dd6; text-align: center; color: white; border-radius: 20px;">
+                                <p>` + startHour + `-` + stopHour +`</p>
+                            </div>
                         </div>
                     `);
                 }
@@ -136,8 +166,11 @@
             },
             success: function(result) {
                 $('td[data-date="' + date + '"]').find('.fc-daygrid-day-events').append(`
-                    <div style="background-color: #7d7dd6; text-align: center; color: white; border-radius: 20px;">
-                            <p>` + result[0].split(' ')[1] + ':00' + `-` + result[1].split(' ')[1] + ':00' +`</p>
+                    <div data-id="` + result[0] + `">
+                        <button class="float-end btn btn-sm pt-0 ml-2" data-id="` + result[0] + `" data-date="` + date + `" onclick="removeApp(this)">&#10006</button>
+                        <div style="background-color: #7d7dd6; text-align: center; color: white; border-radius: 20px;">
+                                <p>` + result[1].split(' ')[1] + ':00' + `-` + result[2].split(' ')[1] + ':00' +`</p>
+                        </div>
                     </div>
                 `);
                 $('.app_' + date).remove();

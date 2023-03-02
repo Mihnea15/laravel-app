@@ -51,14 +51,7 @@ class HomeController extends Controller
             if (round(abs(strtotime($date->start) - strtotime($date->stop)), 2) > 3600) {
                 return \Illuminate\Support\Facades\Response::json('Appointment could not be greater than 1 hour', 500);
             }
-            if ($appointments->isEmpty()) {
-                $model = new Appointment();
-                $model->start = $date->date . ' ' . $date->start;
-                $model->stop = $date->date . ' ' . $date->stop;
-                $model->client_id = 1;
-                $model->save();
-                return [$model->start, $model->stop];
-            } else {
+            if (!$appointments->isEmpty()) {
                 $appointment = DB::table('appointments')
                     ->where('start', 'LIKE', '%' . $date->date . ' ' . explode(':', $date->start)[0] . '%')
                     ->where('stop', 'LIKE', '%' . $date->date . ' ' . explode(':', $date->stop)[0] . '%')->get();
@@ -74,15 +67,27 @@ class HomeController extends Controller
                         }
                     }
                 }
-                $model = new Appointment();
-                $model->start = $date->date . ' ' . $date->start;
-                $model->stop = $date->date . ' ' . $date->stop;
-                $model->client_id = 1;
-                $model->save();
-                return [$model->start, $model->stop];
             }
+            $model = new Appointment();
+            $model->start = $date->date . ' ' . $date->start;
+            $model->stop = $date->date . ' ' . $date->stop;
+            $model->client_id = 1;
+            $model->save();
+            return [$model->id, $model->start, $model->stop];
         }
         return \Illuminate\Support\Facades\Response::json('Appointments must be between 09:00-13:00 or 15:30-21:00', 500);
+    }
+
+    public function removeAppointment(Request $id)
+    {
+        $appointments = Appointment::all();
+        foreach ($appointments as $appointment) {
+            if ($appointment->id == $id['id']) {
+                $appointment->delete();
+                return 'App deleted';
+            }
+        }
+        return \Illuminate\Support\Facades\Response::json('Could not delete appointment', 500);
     }
 
     public function checkExistingApp()
