@@ -1,3 +1,22 @@
+<style>
+    input.timepicker_start::-webkit-calendar-picker-indicator{
+        display:block;
+        top:0;
+        left:0;
+        background: #0000;
+        position:absolute;
+        transform: scale(12)
+    }
+    input.timepicker_stop::-webkit-calendar-picker-indicator{
+        display:block;
+        top:0;
+        left:0;
+        background: #0000;
+        position:absolute;
+        transform: scale(12)
+    }
+</style>
+
 <!DOCTYPE html>
 <html lang='en'>
     <head>
@@ -5,6 +24,9 @@
         <meta name="csrf-token" content="{{ csrf_token() }}" />
         <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
         <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/index.global.min.js'></script>
+        <script src="{{ asset('js/app.js') }}" defer></script>
+        <!-- Styles -->
+        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         <script>
 
             document.addEventListener('DOMContentLoaded', function() {
@@ -22,7 +44,6 @@
     <body>
         <div id='calendar'></div>
         <div>
-            <button class="btn btn-success">Submit appointment</button>
         </div>
     </body>
 </html>
@@ -34,12 +55,12 @@
         date = $(el).attr('data-date');
         if (!$('.fc-daygrid-day-events').find('.start-time-picker_' + date).length) {
             $(el).find('.fc-daygrid-day-events').prepend(`
-                <div class="app_` + date + `">
+                <div class="app_` + date + ` col-9 container">
                     <label>Appointment hours</label>
                     <br>
-                    <input type="time" class="start-time-picker_` + date + `"> -
-                    <input type="time" class="stop-time-picker_` + date + `">
-                    <button class="new_app" onclick="saveApp()">Add another appointment</button>
+                    <input type="time" class="timepicker_start form-control start-time-picker_` + date + `">
+                    <input type="time" class="timepicker_stop form-control stop-time-picker_` + date + `">
+                    <button class="new_app btn btn-secondary mt-2 mb-2 w-100" onclick="saveApp()">Add another appointment</button>
                 </div>
             `);
         }
@@ -120,6 +141,12 @@
 
     $(document).ready(function () {
         checkExistingApp();
+        $('.fc-today-button').on('click', function () {
+            checkExistingApp();
+        });
+        $('.fc-prev-button ').on('click', function () {
+            checkExistingApp();
+        });
     });
 </script>
 
