@@ -38,6 +38,10 @@ class HomeController extends Controller
 
     public function saveApp(Request $date)
     {
+        $dayofweek = date('w', strtotime('2023-02-06'));
+        if ($dayofweek !== '6' || $dayofweek !== '0') {
+            return \Illuminate\Support\Facades\Response::json('The appointment cannot be made on weekends', 500);
+        }
         $appointments = Appointment::all();
         if (strtotime('09:00') <= strtotime($date->start) && strtotime($date->stop) <= strtotime('13:00')
             || strtotime('15:30') <= strtotime($date->start) && strtotime($date->stop) <= strtotime('21:00')) {
