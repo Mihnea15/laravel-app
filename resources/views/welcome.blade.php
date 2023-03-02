@@ -15,7 +15,7 @@
                 calendar.render();
             });
             $(document).on('click', '.fc-day', function (el) {
-                addAppointment(el.currentTarget)
+                addAppointment(el.currentTarget);
             })
         </script>
     </head>
@@ -31,7 +31,7 @@
     let timeIntervals = [];
     let date = null;
     function addAppointment(el) {
-        date = $(el).attr('data-date')
+        date = $(el).attr('data-date');
         if (!$('.fc-daygrid-day-events').find('.start-time-picker_' + date).length) {
             $(el).find('.fc-daygrid-day-events').prepend(`
                 <div class="app_` + date + `">
@@ -59,7 +59,7 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
-        })
+        });
         $.ajax({
             type: 'post',
             enctype: 'multipart/form-data',
@@ -68,7 +68,6 @@
             data: {
             },
             success: function(result){
-                console.log(typeof(result))
                 for (let i = 0; i < result.length; i++) {
                     let date = result[i]['start'].split(' ')[0];
                     let startHour = result[i]['start'].split(' ')[1];
@@ -81,7 +80,7 @@
                 }
             },
             error: function (result) {
-                alert(result.responseJSON)
+                alert(result.responseJSON);
             }
         });
     }
@@ -90,12 +89,12 @@
     {
         let date = timeIntervals['date'];
         let start = timeIntervals['start'];
-        let stop = timeIntervals['stop']
+        let stop = timeIntervals['stop'];
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
-        })
+        });
         $.ajax({
             type: 'post',
             enctype: 'multipart/form-data',
@@ -114,7 +113,7 @@
                 `)
             },
             error: function (result) {
-                alert(result.responseJSON)
+                alert(result.responseJSON);
             }
         });
     }
