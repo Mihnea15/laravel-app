@@ -38,7 +38,10 @@ class HomeController extends Controller
 
     public function saveApp(Request $date)
     {
-        $dayofweek = date('w', strtotime('2023-02-06'));
+        if (strtotime($date->date) < strtotime(date('Y-m-d'))) {
+            return \Illuminate\Support\Facades\Response::json('Appointments can not be made on the past', 500);
+        }
+        $dayofweek = date('w', strtotime($date->date));
         if ($dayofweek === '6' || $dayofweek === '0') {
             return \Illuminate\Support\Facades\Response::json('The appointment cannot be made on weekends', 500);
         }
@@ -70,13 +73,13 @@ class HomeController extends Controller
                             return \Illuminate\Support\Facades\Response::json('Appointments must have half an hour between them', 500);
                         }
                     }
-                    $model = new Appointment();
-                    $model->start = $date->date . ' ' . $date->start;
-                    $model->stop = $date->date . ' ' . $date->stop;
-                    $model->client_id = 1;
-                    $model->save();
-                    return [$model->start, $model->stop];
                 }
+                $model = new Appointment();
+                $model->start = $date->date . ' ' . $date->start;
+                $model->stop = $date->date . ' ' . $date->stop;
+                $model->client_id = 1;
+                $model->save();
+                return [$model->start, $model->stop];
             }
         }
         return \Illuminate\Support\Facades\Response::json('Appointments must be between 09:00-13:00 or 15:30-21:00', 500);
@@ -84,7 +87,6 @@ class HomeController extends Controller
 
     public function checkExistingApp()
     {
-        $existingApp = [];
         $appointments = Appointment::all();
         if (!$appointments->isEmpty()) {
             return $appointments;

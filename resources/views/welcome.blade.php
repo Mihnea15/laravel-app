@@ -135,11 +135,12 @@
                 stop: stop
             },
             success: function(result) {
-                $('.app_' + date).append(`
+                $('td[data-date="' + date + '"]').find('.fc-daygrid-day-events').append(`
                     <div style="background-color: #7d7dd6; text-align: center; color: white; border-radius: 20px;">
-                            <p>` + result[0].split(' ')[1] + `-` + result[1].split(' ')[1] +`</p>
+                            <p>` + result[0].split(' ')[1] + ':00' + `-` + result[1].split(' ')[1] + ':00' +`</p>
                     </div>
-                `)
+                `);
+                $('.app_' + date).remove();
             },
             error: function (result) {
                 alert(result.responseJSON);
