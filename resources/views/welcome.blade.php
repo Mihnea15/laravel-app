@@ -1,22 +1,3 @@
-<style>
-    input.timepicker_start::-webkit-calendar-picker-indicator{
-        display:block;
-        top:0;
-        left:0;
-        background: #0000;
-        position:absolute;
-        transform: scale(12)
-    }
-    input.timepicker_stop::-webkit-calendar-picker-indicator{
-        display:block;
-        top:0;
-        left:0;
-        background: #0000;
-        position:absolute;
-        transform: scale(12)
-    }
-</style>
-
 <!DOCTYPE html>
 <html lang='en'>
     <head>
