@@ -7,7 +7,7 @@
         <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/index.global.min.js'></script>
         <script src="{{ asset('js/app.js') }}" defer></script>
         <!-- Styles -->
-        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/app.css') }}" rel="stylesheet" type="text/css">
         <script>
 
             document.addEventListener('DOMContentLoaded', function() {
